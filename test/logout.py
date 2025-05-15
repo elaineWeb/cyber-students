@@ -23,7 +23,11 @@ class LogoutHandlerTest(BaseTest):
         yield self.get_app().db.users.insert_one({
             'email': self.email,
             'password': self.password,
-            'displayName': 'testDisplayName'
+            'displayName': 'testDisplayName', 
+            'salt': self.salt,
+            'hash': self.hash,
+            'iterations': 100_000           
+
         })
 
     @coroutine
@@ -39,6 +43,16 @@ class LogoutHandlerTest(BaseTest):
 
         self.email = 'test@test.com'
         self.password = 'testPassword'
+        
+        self.salt = ''
+        #self.hash = ''
+
+        # don't need the salt and hash for this test, but if I do need to use it this is what it should be  
+        #self.salt = 'Eft9sTjMKBYgVD5BsYR2sA=='
+
+        # this is a known value for my test - the hash for the password 'testPassword' with the salt 'Eft9sTjMKBYgVD5BsYR2sA=='
+        self.hash = 'eP7VJext6P74t4k2KZ7kLVOsLDi7WhX3tA7FIOhChu8='
+        
         self.token = 'testToken'
 
         IOLoop.current().run_sync(self.register)

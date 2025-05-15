@@ -17,6 +17,7 @@ class RegistrationHandlerTest(BaseTest):
         super().setUpClass()
 
     def test_registration(self):
+       
         email = 'test@test.com'
         display_name = 'testDisplayName'
 
@@ -31,7 +32,16 @@ class RegistrationHandlerTest(BaseTest):
 
         body_2 = json_decode(response.body)
         self.assertEqual(email, body_2['email'])
-        self.assertEqual(display_name, body_2['displayName'])
+
+        #I only need this for debugging purposes
+        print("Key = " + self.my_app.AES_KEY.hex() + " NAME = " + body_2['displayName'] + " ** EMAIL = " + email)
+
+        'EMC - need to decrypt the display name'
+        decodedName = self.decrypt_text(body_2['displayName'], self.my_app.AES_KEY, email)
+
+
+        #self.assertEqual(display_name, body_2['displayName'])
+        self.assertEqual(display_name, decodedName)
 
     def test_registration_without_display_name(self):
         email = 'test@test.com'
@@ -41,12 +51,22 @@ class RegistrationHandlerTest(BaseTest):
           'password': 'testPassword'
         }
 
+        # EMC- I left the registration with the minimum required fields - email and password
         response = self.fetch('/registration', method='POST', body=dumps(body))
         self.assertEqual(200, response.code)
 
         body_2 = json_decode(response.body)
+
+      
         self.assertEqual(email, body_2['email'])
-        self.assertEqual(email, body_2['displayName'])
+        
+        'EMC - need to decrypt the display name to complre to make sure it is the same and the encryption is working'
+        decodedName = self.decrypt_text(body_2['displayName'], self.my_app.AES_KEY, email)   
+        
+        # check against the new value entered if there is no display name
+        novalue = "NO display name entered"     
+        self.assertEqual(novalue, decodedName)
+        #self.assertEqual(email, body_2['displayName'])
 
     def test_registration_twice(self):
         body = {

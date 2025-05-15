@@ -1,3 +1,4 @@
+import base64
 from json import dumps
 from tornado.escape import json_decode, utf8
 from tornado.gen import coroutine
@@ -22,7 +23,11 @@ class LoginHandlerTest(BaseTest):
         yield self.get_app().db.users.insert_one({
             'email': self.email,
             'password': self.password,
-            'displayName': 'testDisplayName'
+            'displayName': 'testDisplayName', 
+            'salt': self.salt,
+            'hash': self.hash,
+            'iterations': 100_000           
+
         })
 
     def setUp(self):
@@ -31,6 +36,14 @@ class LoginHandlerTest(BaseTest):
         self.email = 'test@test.com'
         self.password = 'testPassword'
 
+       
+        # I don't need the pepper as I have a hash that is a combination of the password and salt and the pepper
+        self.salt = 'Eft9sTjMKBYgVD5BsYR2sA=='
+
+        # this is a known value for my test - the hash for the password 'testPassword' with the salt 'Eft9sTjMKBYgVD5BsYR2sA=
+        self.hash = 'eP7VJext6P74t4k2KZ7kLVOsLDi7WhX3tA7FIOhChu8='
+
+      
         IOLoop.current().run_sync(self.register)
 
     def test_login(self):
@@ -41,6 +54,9 @@ class LoginHandlerTest(BaseTest):
 
         response = self.fetch('/login', method='POST', body=dumps(body))
         self.assertEqual(200, response.code)
+
+        #only for debugging purposes
+        #self.fail("Force fail as I can not see print output")
 
         body_2 = json_decode(response.body)
         self.assertIsNotNone(body_2['token'])

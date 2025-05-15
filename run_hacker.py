@@ -12,11 +12,18 @@ def get_users(db):
     'email': 1,
     'password': 1,
     'displayName': 1,
+    'fullName': 1,
+    'address': 1,
+    'dob': 1, 
+    'phoneNumber': 1,
+    'disabilities': 1
   })
   docs = yield cur.to_list(length=None)
   print('There are ' + str(len(docs)) + ' registered users:')
   for doc in docs:
     click.echo(doc)
+
+
 
 @click.group()
 def cli():

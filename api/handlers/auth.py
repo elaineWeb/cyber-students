@@ -27,6 +27,11 @@ class AuthHandler(BaseHandler):
         }, {
             'email': 1,
             'displayName': 1,
+            'fullName': 1,
+            'dob': 1,
+            'address': 1,
+            'phoneNumber': 1,
+            'disabilities': 1,
             'expiresIn': 1
         })
 
@@ -42,6 +47,11 @@ class AuthHandler(BaseHandler):
             return
 
         self.current_user = {
-            'email': user['email'],
-            'display_name': user['displayName']
+            'email': user.get('email', ''),
+            'display_name': user.get('displayName', ''),
+            'dob': user.get('dob', ''),
+            'fullName': user.get('fullName', ''),
+            'disabilities': user.get('disabilities', []),  # assuming this is a list
+            'address': user.get('address', ''),
+            'phoneNumber': user.get('phoneNumber', '')
         }
